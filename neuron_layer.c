@@ -82,9 +82,10 @@ Vector *layer_neuron_backward(void *layer_base, Vector *gradient) {
         vector_destroy(neuron_loss);
 
         // update the weights
-        for (int j = 0; j < input->size; j++) {
-            neuron->weights->data[j] -= learning_rate * delta * input->data[j];
-        }
+        Vector *input_vector = vector_copy(input);
+        vector_mul_value(input_vector, learning_rate * delta);
+        vector_sub(neuron->weights, input_vector);
+        vector_destroy(input_vector);
         neuron->bias -= learning_rate * delta;
     }
     vector_destroy(gradient);
