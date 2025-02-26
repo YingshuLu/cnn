@@ -4,6 +4,32 @@
 #include <math.h>
 #include "neuron_layer.h"
 
+/*
+Define: network has 3 layers:
+    X = [x1, x2, x3]
+
+    M = F(X) = W1 * X + B1
+
+    N = L(M) = LERU(M)
+
+    P = G(N) = W2 * N + B2
+
+    Y = H(P) = SIGMOID(P)
+
+so backward gradient:
+
+    layer 3:
+        dY/dW2 = dY/dP * dP/dW2 = dSIGMOD(P)/dP * N
+
+        dY/dB2 = dY/dP * dP/dB2 = dSIGMOD(P)/dP * 1
+
+    layer 2:
+        dY/dW1 = dY/dP * dP/dN * dN/dM * dM/dW1 = dSIGMOD(P)/dP * W2 * dLERU(M)/dM * X
+
+        dY/dB1 = dY/dP * dP/dN * dN/dM * dM/dB1 = dSIGMOD(P)/dP * W2 * dLERU(M)/dM * 1
+    
+*/
+
 void layer_neuron_update_input(LayerNeuron *layer, Vector *input) {
     vector_destroy(layer->input);
     refer(input);
@@ -48,15 +74,18 @@ Vector *layer_neuron_backward(void *layer_base, Vector *gradient) {
         if (fabs(delta) > 1.0) {
             delta = delta > 0 ? 1.0 : -1.0;
         }
-        for (int j = 0; j < input->size; j++) {
-            neuron->weights->data[j] -= learning_rate * delta * input->data[j];
-        }
-        neuron->bias -= learning_rate * delta;
-        
+
+        // calculate the previous layer's gradient
         Vector* neuron_loss = vector_copy(neuron->weights);
         vector_mul_value(neuron_loss, delta);
         vector_add(new_gradient, neuron_loss);
         vector_destroy(neuron_loss);
+
+        // update the weights
+        for (int j = 0; j < input->size; j++) {
+            neuron->weights->data[j] -= learning_rate * delta * input->data[j];
+        }
+        neuron->bias -= learning_rate * delta;
     }
     vector_destroy(gradient);
     return new_gradient;

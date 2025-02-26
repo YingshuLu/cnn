@@ -5,6 +5,7 @@
 #include <string.h>
 #include "network.h"
 #include "neuron_layer.h"
+
 float binary_cross_entropy(Vector *predicted, Vector *target) {
     float loss = 0.0f;
     float epsilon = 1e-15; // 防止log(0)
