@@ -47,9 +47,12 @@ Vector *layer_neuron_forward(void *layer_base, Vector *input) {
     assert(input->size == layer->input_size);
     layer_neuron_update_input(layer, input);
     Vector* output = vector_create(layer->neurons_size);
+
+    #pragma omp parallel for
     for (int i = 0; i < layer->neurons_size; i++) {
         output->data[i] = neuron_activate(layer->neurons[i], input);
     }
+    
     layer_neuron_update_output(layer, output);
     return output;
 }
@@ -64,13 +67,12 @@ Vector *layer_neuron_backward(void *layer_base, Vector *gradient) {
     Vector *input = layer->input;
     float learning_rate = layer->learning_rate;
 
-    Neuron *neuron;
-    float loss_value, delta;
+    #pragma omp parallel for
     for (int i = 0; i < layer->neurons_size; i++) {
-        neuron = layer->neurons[i];
-        loss_value = gradient->data[i];
+        Neuron *neuron = layer->neurons[i];
+        float loss_value = gradient->data[i];
         float error = neuron->activation->derivate(neuron->linear_output);
-        delta = error * loss_value;
+        float delta = error * loss_value;
         if (fabs(delta) > 1.0) {
             delta = delta > 0 ? 1.0 : -1.0;
         }
@@ -78,7 +80,10 @@ Vector *layer_neuron_backward(void *layer_base, Vector *gradient) {
         // calculate the previous layer's gradient
         Vector* neuron_loss = vector_copy(neuron->weights);
         vector_mul_value(neuron_loss, delta);
-        vector_add(new_gradient, neuron_loss);
+        #pragma omp critical
+        {
+            vector_add(new_gradient, neuron_loss);
+        }
         vector_destroy(neuron_loss);
 
         // update the weights
@@ -88,6 +93,7 @@ Vector *layer_neuron_backward(void *layer_base, Vector *gradient) {
         vector_destroy(input_vector);
         neuron->bias -= learning_rate * delta;
     }
+
     vector_destroy(gradient);
     return new_gradient;
 }
@@ -104,6 +110,8 @@ LayerNeuron *layer_neuron_create(int size, int input_size, Activation *activatio
 
     layer->layer.forward = layer_neuron_forward;
     layer->layer.backward = layer_neuron_backward;
+    layer->input = 0;
+    layer->output = 0;
     return layer;
 }
 
