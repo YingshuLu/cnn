@@ -10,7 +10,7 @@ int main() {
 
     int input_size = 8;
     int output_size = 3;
-    int samples_count = 10;
+    int samples_count = 20;
 
     float train_data[][8] = {
         {0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0},
@@ -23,6 +23,16 @@ int main() {
         {0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0},
         {1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0},
         {1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0},
+        {0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0},
+        {1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0},
+        {1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0},
+        {0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0},
+        {1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0},
+        {0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0},
+        {1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0},
+        {0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0},
+        {1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0},
+        {0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0}
     };
 
     float label_data[][3] = {
@@ -36,6 +46,16 @@ int main() {
         {1.0f, 1.0f, 0.0f},
         {1.0f, 1.0f, 0.0f},
         {1.0f, 0.0f, 0.0f},
+        {0.0f, 1.0f, 0.0f},
+        {1.0f, 0.0f, 0.0f},
+        {1.0f, 1.0f, 0.0f},
+        {0.0f, 1.0f, 1.0f},
+        {1.0f, 0.0f, 1.0f},
+        {0.0f, 0.0f, 1.0f},
+        {1.0f, 1.0f, 0.0f},
+        {0.0f, 1.0f, 1.0f},
+        {1.0f, 0.0f, 1.0f},
+        {0.0f, 1.0f, 0.0f}
     };
 
     float test_input_data[] = {0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0};
@@ -50,7 +70,7 @@ int main() {
 
     Network *network = network_create();
 
-    LayerNeuron *layer0 = layer_neuron_create(6, input_size, activation_relu(), 0.001);
+    LayerNeuron *layer0 = layer_neuron_create(6, input_size, activation_leaky_relu(), 0.001);
     LayerNeuron *layer1 = layer_neuron_create(3, layer0->neurons_size, activation_sigmoid(), 0.001);
     
     network_add_layer(network, (Layer*)layer0);

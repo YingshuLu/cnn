@@ -4,13 +4,14 @@
 
 Activation *sigmoid_instance = 0;
 Activation *relu_instance = 0;
+Activation *leaky_relu_instance = 0;
 
 float sigmoid(float x) {
     return 1.0 / (1.0 + exp(-x));
 }
 
 float relu(float x) {
-    return x > 0 ? x : 0.01f;
+    return x > 0 ? x : 0.0f;
 }
 
 float sigmoid_derivative(float x) {
@@ -18,6 +19,14 @@ float sigmoid_derivative(float x) {
 }
 
 float relu_derivative(float x) {
+    return x > 0 ? 1.0f : 0.0f;
+}
+
+float leaky_relu(float x) {
+    return x > 0 ? x : 0.01f * x;
+}
+
+float leaky_relu_derivative(float x) {
     return x > 0 ? 1.0f : 0.01f;
 }
 
@@ -43,3 +52,11 @@ Activation *activation_relu() {
     return relu_instance;
 }
 
+Activation *activation_leaky_relu() {
+    if (!leaky_relu_instance) {
+        leaky_relu_instance = activation_create();
+        leaky_relu_instance->activate = leaky_relu;
+        leaky_relu_instance->derivate = leaky_relu_derivative;
+    }
+    return leaky_relu_instance;
+}
