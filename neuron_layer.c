@@ -6,15 +6,16 @@
 
 /*
 Define: network has 3 layers:
-    X = [x1, x2, x3]
+    layer 1:
+        X = [x1, x2, x3]
+    
+    layer 2:
+        M = F(X) = W1 * X + B1
+        N = L(M) = LERU(M)
 
-    M = F(X) = W1 * X + B1
-
-    N = L(M) = LERU(M)
-
-    P = G(N) = W2 * N + B2
-
-    Y = H(P) = SIGMOID(P)
+    layer 3:
+        P = G(N) = W2 * N + B2
+        Y = H(P) = SIGMOID(P)
 
 so backward gradient:
 
@@ -24,10 +25,9 @@ so backward gradient:
         dY/dB2 = dY/dP * dP/dB2 = dSIGMOD(P)/dP * 1
 
     layer 2:
-        dY/dW1 = dY/dP * dP/dN * dN/dM * dM/dW1 = dSIGMOD(P)/dP * W2 * dLERU(M)/dM * X
+        dY/dW1 = dY/dP * dP/dN * dN/dM * dM/dW1 = Sum(dSIGMOD(P)/dP * W2) * dLERU(M)/dM * X
 
-        dY/dB1 = dY/dP * dP/dN * dN/dM * dM/dB1 = dSIGMOD(P)/dP * W2 * dLERU(M)/dM * 1
-    
+        dY/dB1 = dY/dP * dP/dN * dN/dM * dM/dB1 = Sum(dSIGMOD(P)/dP * W2) * dLERU(M)/dM * 1
 */
 
 void layer_neuron_update_input(LayerNeuron *layer, Vector *input) {

@@ -49,9 +49,11 @@ int main() {
     }
 
     Network *network = network_create();
-    LayerNeuron *layer0 = layer_neuron_create(8, input_size, activation_relu(), 0.001);
-    network_add_layer(network, (Layer*)layer0);
+
+    LayerNeuron *layer0 = layer_neuron_create(6, input_size, activation_relu(), 0.001);
     LayerNeuron *layer1 = layer_neuron_create(3, layer0->neurons_size, activation_sigmoid(), 0.001);
+    
+    network_add_layer(network, (Layer*)layer0);
     network_add_layer(network, (Layer*)layer1);
 
     network_train(network, inputs, samples_count, labels, 10000);
@@ -63,7 +65,7 @@ int main() {
         output->data[0], output->data[1], output->data[2],
         binary_predict(output->data[0]), binary_predict(output->data[1]), binary_predict(output->data[2]));
 
-    for (int i = 0; i < input_size; i++) {
+    for (int i = 0; i < samples_count; i++) {
         output = network_predict(network, inputs[i]);
         printf("Input: [%f, %f, %f, %f, %f, %f, %f, %f] RawOutput: [%f, %f, %f] BinaryOutput: [%f, %f, %f]\n", 
             inputs[i]->data[0], inputs[i]->data[1], inputs[i]->data[2], inputs[i]->data[3], inputs[i]->data[4], inputs[i]->data[5], inputs[i]->data[6], inputs[i]->data[7],
