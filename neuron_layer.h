@@ -14,6 +14,6 @@ typedef struct LayerNeuron {
 } LayerNeuron;
 
 LayerNeuron *layer_neuron_create(int size, int input_size, Activation *activation, float learning_rate);
-void layer_neuron_destroy(LayerNeuron *layer);
+void layer_neuron_free(LayerNeuron *layer);
 
 #endif

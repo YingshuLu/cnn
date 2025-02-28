@@ -2,48 +2,21 @@
 #include <assert.h>
 #include <math.h>
 
+#include "operator.h"
 #include "vector.h"
 
-typedef void(*_value_operation)(float* target, float value);
-
-void _fill(float* target, float value) {
-    *target = value;
-}
-
-void _add(float* target, float value) {
-    *target += value;
-}
-
-void _sub(float* target, float value) {
-    *target -= value;
-}
-
-void _mul(float* target, float value) {
-    *target *= value;
-}
-
-void _div(float* target, float value) {
-    *target /= value;
-}
-
-void _mod(float* target, float value) {
-    *target = fmod(*target, value);
-}
-
-void _pow(float* target, float value) {
-    *target = pow(*target, value);
-}
+typedef float(*_value_operation)(float target, float value);
 
 void _vector_value_operation(Vector *vector, float value, _value_operation operation) {
     for (int i = 0; i < vector->size; i++) {
-        operation(&vector->data[i], value);
+        vector->data[i] = operation(vector->data[i], value);
     }
 }
 
 void _vector_vector_operation(Vector *vector, Vector *other, _value_operation operation) {
     assert(vector->size == other->size);
     for (int i = 0; i < vector->size; i++) {
-        operation(&vector->data[i], other->data[i]);
+        vector->data[i] = operation(vector->data[i], other->data[i]);
     }
 }
 
@@ -61,7 +34,7 @@ Vector *vector_create(int size) {
     return vector;
 }
 
-void vector_destroy(Vector *vector) {
+void vector_free(Vector *vector) {
     if (!vector) {
         return;
     }
@@ -95,7 +68,7 @@ Vector *vector_copy(Vector *vector) {
 }
 
 void vector_fill(Vector *vector, float value) {
-    _vector_value_operation(vector, value, _fill);
+    _vector_value_operation(vector, value, float_fill);
 }
 
 void vector_randomize(Vector *vector, float min, float max) {
@@ -105,35 +78,35 @@ void vector_randomize(Vector *vector, float min, float max) {
 }
 
 void vector_add_value(Vector *vector, float value) {
-    _vector_value_operation(vector, value, _add);
+    _vector_value_operation(vector, value, float_add);
 }
 
 void vector_sub_value(Vector *vector, float value) {
-    _vector_value_operation(vector, value, _sub);
+    _vector_value_operation(vector, value, float_sub);
 }
 
 void vector_mul_value(Vector *vector, float value) {
-    _vector_value_operation(vector, value, _mul);
+    _vector_value_operation(vector, value, float_mul);
 }
 
 void vector_div_value(Vector *vector, float value) {
-    _vector_value_operation(vector, value, _div);
+    _vector_value_operation(vector, value, float_div);
 }
 
 void vector_mod_value(Vector *vector, float value) {
-    _vector_value_operation(vector, value, _mod);
+    _vector_value_operation(vector, value, float_mod);
 }
 
 void vector_pow_value(Vector *vector, float value) {
-    _vector_value_operation(vector, value, _pow);
+    _vector_value_operation(vector, value, float_pow);
 }
 
 void vector_add(Vector *vector, Vector *other) {
-    _vector_vector_operation(vector, other, _add);
+    _vector_vector_operation(vector, other, float_add);
 }
 
 void vector_sub(Vector *vector, Vector *other) {
-    _vector_vector_operation(vector, other, _sub);
+    _vector_vector_operation(vector, other, float_sub);
 }
 
 float vector_dot(Vector *vector, Vector *other) {
@@ -151,6 +124,7 @@ void vector_multiply(Vector *vector, Vector *other) {
         vector->data[i] = vector->data[i] * other->data[i];
     }
 }
+
 void vector_normalize(Vector *vector) {
     float length = 0;
     for (int i = 0; i < vector->size; i++) {

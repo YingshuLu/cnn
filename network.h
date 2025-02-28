@@ -10,13 +10,9 @@ typedef struct Network {
 } Network;
 
 Network *network_create();
-
 void network_add_layer(Network *network, Layer *layer);
-
 Vector *network_predict(Network *network, Vector *input);
-
 void network_train(Network *network, Vector **samples, int samples_count, Vector **labels, int epochs);
-
-void network_destroy(Network *network);
+void network_free(Network *network);
 
 #endif

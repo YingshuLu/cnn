@@ -10,8 +10,8 @@ Neuron *neuron_create(int input_size, Activation *activation) {
     return neuron;
 }
 
-void neuron_destroy(Neuron *neuron) {
-    vector_destroy(neuron->weights);
+void neuron_free(Neuron *neuron) {
+    vector_free(neuron->weights);
     free(neuron);
 }
 

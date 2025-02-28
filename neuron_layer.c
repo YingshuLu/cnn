@@ -31,13 +31,13 @@ so backward gradient:
 */
 
 void layer_neuron_update_input(LayerNeuron *layer, Vector *input) {
-    vector_destroy(layer->input);
+    vector_free(layer->input);
     refer(input);
     layer->input = input;
 }
 
 void layer_neuron_update_output(LayerNeuron *layer, Vector *output) {
-    vector_destroy(layer->output);
+    vector_free(layer->output);
     refer(output);
     layer->output = output;
 }
@@ -84,17 +84,17 @@ Vector *layer_neuron_backward(void *layer_base, Vector *gradient) {
         {
             vector_add(new_gradient, neuron_loss);
         }
-        vector_destroy(neuron_loss);
+        vector_free(neuron_loss);
 
         // update the weights
         Vector *input_vector = vector_copy(input);
         vector_mul_value(input_vector, learning_rate * delta);
         vector_sub(neuron->weights, input_vector);
-        vector_destroy(input_vector);
+        vector_free(input_vector);
         neuron->bias -= learning_rate * delta;
     }
 
-    vector_destroy(gradient);
+    vector_free(gradient);
     return new_gradient;
 }
 
@@ -115,13 +115,13 @@ LayerNeuron *layer_neuron_create(int size, int input_size, Activation *activatio
     return layer;
 }
 
-void layer_neuron_destroy(LayerNeuron *layer) {
+void layer_neuron_free(LayerNeuron *layer) {
     for (int i = 0; i < layer->neurons_size; i++) {
-        neuron_destroy(layer->neurons[i]);
+        neuron_free(layer->neurons[i]);
     }
     free(layer->neurons);
-    vector_destroy(layer->input);
-    vector_destroy(layer->output);
+    vector_free(layer->input);
+    vector_free(layer->output);
     free(layer);
 }
 

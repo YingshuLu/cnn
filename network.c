@@ -93,7 +93,7 @@ void network_train(Network *network, Vector **samples, int samples_count, Vector
             for (int j = network->count - 1; j >= 0; j--) {
                 gradient = network->layers[j]->backward(network->layers[j], gradient);
             }
-            vector_destroy(predicted);
+            vector_free(predicted);
         }
 
         epoch_loss /= samples_count;
@@ -104,7 +104,7 @@ void network_train(Network *network, Vector **samples, int samples_count, Vector
     }
 }
 
-void network_destroy(Network *network) {
+void network_free(Network *network) {
     for (int i = 0; i < network->count; i++) {
         free(network->layers[i]);
     }

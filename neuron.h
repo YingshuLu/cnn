@@ -12,7 +12,7 @@ typedef struct Neuron {
 } Neuron;
 
 Neuron *neuron_create(int input_size, Activation *activation);
-void neuron_destroy(Neuron *neuron);
+void neuron_free(Neuron *neuron);
 float neuron_activate(Neuron *neuron, Vector *input);
 
 #endif

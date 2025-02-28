@@ -7,9 +7,7 @@ typedef struct Activation {
 } Activation;
 
 Activation *activation_sigmoid();
-
 Activation *activation_relu();
-
 Activation *activation_leaky_relu();
 
 #endif
