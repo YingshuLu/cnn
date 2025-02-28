@@ -4,6 +4,9 @@
 #include <stdlib.h>
 #include "refer.h"
 
+#define vector_refer(vector) (refer(&(vector)->refer), (vector))
+#define vector_unrefer(vector) vector_free(vector)
+
 typedef struct Vector {
     Refer refer;
     float *data;

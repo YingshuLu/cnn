@@ -31,15 +31,13 @@ so backward gradient:
 */
 
 void layer_neuron_update_input(LayerNeuron *layer, Vector *input) {
-    vector_free(layer->input);
-    refer(input);
-    layer->input = input;
+    vector_unrefer(layer->input);
+    layer->input = vector_refer(input);
 }
 
 void layer_neuron_update_output(LayerNeuron *layer, Vector *output) {
-    vector_free(layer->output);
-    refer(output);
-    layer->output = output;
+    vector_unrefer(layer->output);
+    layer->output = vector_refer(output);
 }
 
 Vector *layer_neuron_forward(void *layer_base, Vector *input) {

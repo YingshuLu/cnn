@@ -25,6 +25,9 @@ float float_pow(float a, float b) {
     return powf(a, b);
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 float float_fill(float a, float b) {
     return b;
 }
+#pragma GCC diagnostic pop
