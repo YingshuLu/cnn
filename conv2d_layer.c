@@ -8,7 +8,7 @@ Conv2DLayer *conv2d_layer_create(int in_channels, int out_channels, int kernel_s
     layer->kernels = calloc(out_channels, sizeof(ConvKernel *));
     layer->kernel_size = kernel_size;
     for (int i = 0; i < out_channels; i++) {
-        layer->kernels[i] = conv_kernel_create(tensor_create(kernel_size, kernel_size, in_channels), 0.0f, stride, padding, activation);
+        layer->kernels[i] = conv_kernel_create(tensor_create(kernel_size, kernel_size, in_channels), 0.0f, 0.001f, stride, padding, activation);
     }
     layer->input = 0;
     return layer;
@@ -23,6 +23,7 @@ void conv2d_layer_free(Conv2DLayer *layer) {
 }
 
 void conv2d_layer_init_bias(Conv2DLayer *layer, Vector *bias) {
+    assert(bias->size == layer->out_channels);
     for (int i = 0; i < layer->out_channels; i++) {
         layer->kernels[i]->bias = bias->data[i];
     }
@@ -47,4 +48,24 @@ Tensor *conv2d_layer_forward(Conv2DLayer *layer, Tensor *input) {
 
     free(kernel_outputs);
     return output;
+}
+
+Tensor *conv2d_layer_backward(Conv2DLayer *layer, Tensor *input, Tensor *gradient) {
+    Tensor **input_gradients = (Tensor **)calloc(layer->out_channels, sizeof(Tensor *));
+
+    #pragma omp parallel for
+    for (int i = 0; i < layer->out_channels; i++) {
+        Tensor *single_grandient = tensor_slice_refer(gradient, i, i + 1);
+        input_gradients[i] = conv_kernel_backward(layer->kernels[i], input, single_grandient);
+        tensor_unrefer(single_grandient);
+    }
+
+    Tensor *input_gradient = input_gradients[0];
+    for (int i = 1; i < layer->out_channels; i++) {
+        tensor_add(input_gradient, input_gradients[i]);
+        tensor_unrefer(input_gradients[i]);
+    }
+
+    free(input_gradients);
+    return input_gradient;
 }

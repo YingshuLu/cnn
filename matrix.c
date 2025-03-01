@@ -1,5 +1,7 @@
 #include <assert.h>
 #include "matrix.h"
+#include "vector.h"
+#include "operator.h"
 
 void _matrix_destory(void *obj){
     Matrix *matrix = (Matrix *)obj;
@@ -17,6 +19,18 @@ Matrix *_matrix_create_empty(int rows, int cols) {
     matrix->vectors = (Vector **)malloc(rows * sizeof(Vector *));
     refer_init(&matrix->refer);
     return matrix;
+}
+
+Matrix *_matrix_matrix_operation(Matrix *matrix, Matrix *other, float (*operation)(float, float)) {
+    assert(matrix->rows == other->rows && matrix->cols == other->cols);
+
+    Matrix *result = matrix_create(matrix->rows, matrix->cols);
+    for (int i = 0; i < matrix->rows; i++) {
+        for (int j = 0; j < matrix->cols; j++) {
+            matrix_set(result, i, j, operation(matrix_get(matrix, i, j), matrix_get(other, i, j)));
+        }
+    }
+    return result;
 }
 
 Matrix *matrix_create(int rows, int cols) {
@@ -93,4 +107,34 @@ Matrix *matrix_multiply(Matrix *matrix, Matrix *other) {
         }
     }
     return result;
+}
+
+void matrix_add(Matrix *matrix, Matrix *other) {
+    _matrix_matrix_operation(matrix, other, float_add);
+}
+
+void matrix_sub(Matrix *matrix, Matrix *other) {
+    _matrix_matrix_operation(matrix, other, float_sub);
+}
+
+void matrix_mul(Matrix *matrix, Matrix *other) {
+    _matrix_matrix_operation(matrix, other, float_mul);
+}
+
+void matrix_div(Matrix *matrix, Matrix *other) {
+    _matrix_matrix_operation(matrix, other, float_div);
+}
+
+float matrix_sum(Matrix *matrix) {
+    float sum = 0.0f;
+    for (int i = 0; i < matrix->rows; i++) {
+        sum += vector_sum(matrix->vectors[i]);
+    }
+    return sum;
+}
+
+void matrix_apply(Matrix *matrix, float (*operation)(float)) {
+    for (int i = 0; i < matrix->rows; i++) {
+        vector_apply(matrix->vectors[i], operation);
+    }
 }

@@ -19,6 +19,8 @@ Vector* vector_create_from_array(float *array, int size);
 int vector_size(Vector *vector);
 void vector_set(Vector *vector, int index, float value);
 float vector_get(Vector *vector, int index);
+float vector_sum(Vector *vector);
+void vector_apply(Vector *vector, float (*operation)(float));
 Vector* vector_copy(Vector *vector);
 void vector_fill(Vector *vector, float value);
 void vector_randomize(Vector *vector, float min, float max);

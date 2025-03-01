@@ -25,4 +25,11 @@ Matrix *matrix_transpose(Matrix *matrix);
 
 Matrix *matrix_multiply(Matrix *matrix, Matrix *other);
 
+void matrix_add(Matrix *matrix, Matrix *other);
+void matrix_sub(Matrix *matrix, Matrix *other);
+void matrix_mul(Matrix *matrix, Matrix *other);
+void matrix_div(Matrix *matrix, Matrix *other);
+
+float matrix_sum(Matrix *matrix);
+
 #endif

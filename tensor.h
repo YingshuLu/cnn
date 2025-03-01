@@ -29,7 +29,16 @@ void tensor_div_value(Tensor *tensor, float value);
 void tensor_mod_value(Tensor *tensor, float value);
 void tensor_pow_value(Tensor *tensor, float value);
 void tensor_fill_value(Tensor *tensor, float value);
+float tensor_sum(Tensor *tensor);
 void tensor_concat_copy(Tensor *input, Tensor *target);
 void tensor_concat_refer(Tensor *input, Tensor *target);
+
+void tensor_add(Tensor *tensor, Tensor *other);
+void tensor_sub(Tensor *tensor, Tensor *other);
+void tensor_mul(Tensor *tensor, Tensor *other);
+void tensor_div(Tensor *tensor, Tensor *other);
+
+Tensor *tensor_slice_copy(Tensor *tensor, int depth_start, int depth_end);
+Tensor *tensor_slice_refer(Tensor *tensor, int depth_start, int depth_end);
 
 #endif

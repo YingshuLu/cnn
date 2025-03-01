@@ -16,6 +16,6 @@ Conv2DLayer *conv2d_layer_create(int in_channels, int out_channels, int kernel_s
 void conv2d_layer_init_bias(Conv2DLayer *layer, Vector *bias);
 void conv2d_layer_free(Conv2DLayer *layer);
 Tensor *conv2d_layer_forward(Conv2DLayer *layer, Tensor *input);
-Tensor *conv2d_layer_backward(Conv2DLayer *layer, Tensor *input, Tensor *output, Tensor *d_output);
+Tensor *conv2d_layer_backward(Conv2DLayer *layer, Tensor *input, Tensor *gradient);
 
 #endif

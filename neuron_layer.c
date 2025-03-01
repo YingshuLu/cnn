@@ -122,6 +122,3 @@ void layer_neuron_free(LayerNeuron *layer) {
     vector_free(layer->output);
     free(layer);
 }
-
-
-

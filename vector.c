@@ -61,6 +61,20 @@ float vector_get(Vector *vector, int index) {
     return vector->data[index];
 }
 
+float vector_sum(Vector *vector) {
+    float sum = 0;
+    for (int i = 0; i < vector->size; i++) {
+        sum += vector->data[i];
+    }
+    return sum;
+}
+
+void vector_apply(Vector *vector, float (*operation)(float)) {
+    for (int i = 0; i < vector->size; i++) {
+        vector->data[i] = operation(vector->data[i]);
+    }
+}
+
 Vector *vector_copy(Vector *vector) {
     Vector *copy = vector_create(vector->size);
     vector_add(copy, vector);
