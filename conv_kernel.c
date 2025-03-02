@@ -13,7 +13,7 @@ Tensor *_tensor_conv2d(Tensor *input, Tensor *kernel, int stride, int padding, f
     for (int i = 0; i < output_rows; i++) {
         for (int j = 0; j < output_cols; j++) {
             float sum = 0.0f;
-            for (int d = 0; d < input->depth; d++) {
+            for (int d = 0; d < kernel->depth; d++) {
                 for (int k = 0; k < kernel->rows; k++) {
                     for (int l = 0; l < kernel->cols; l++) {
                         int ix = i * stride + k - padding;
@@ -64,24 +64,48 @@ Tensor *conv_kernel_backward(ConvKernel *kernel, Tensor *input, Tensor *gradient
     // Initialize gradients for input and kernel
     Tensor *input_gradient = tensor_create(input->rows, input->cols, input->depth);
     Tensor *kernel_gradient = tensor_create(kernel->tensor->rows, kernel->tensor->cols, kernel->tensor->depth);
-    float bias_gradient = tensor_sum(gradient);
+    float bias_gradient = 0.0f;
 
-    // Compute gradients
-    for (int i = 0; i < input->rows; i++) {
-        for (int j = 0; j < input->cols; j++) {
-            for (int d = 0; d < input->depth; d++) {
-                for (int k = 0; k < kernel->tensor->rows; k++) {
-                    for (int l = 0; l < kernel->tensor->cols; l++) {
-                        int ix = i + k - kernel->padding;
-                        int iy = j + l - kernel->padding;
-                        if (ix >= 0 && ix < input->rows && iy >= 0 && iy < input->cols) {
-                            float grad_value = tensor_get(gradient, i, j, 0);
+    /*
+       [Example]
+       Input: [M, N, 3]
+       Kernel: [3, 3, 3]
+       
+       reshape:
+       Sampling: Matrix[MN, 27]
+       Kernel: Matrix[27, 1]
 
-                            float input_value = tensor_get(input_gradient, ix, iy, d) + grad_value * tensor_get(kernel->tensor, k, l, d);
-                            tensor_set(input_gradient, ix, iy, d, input_value);
+       forward:
+       F = [MN x 27] x [27 x 1] = [MN x 1]
+       backward:
+       dF/Dw = [1 x MN] x [MN x 27] = [1 x 27]
+       dF/Db = Sum([MN x 1]) = [1 x 1]
+       dF/Dx = [MN x 1] x [1 x 27] = [MN x 27]
+    */
 
-                            float kernel_value = tensor_get(kernel_gradient, k, l, d) + grad_value * tensor_get(input, ix, iy, d);
-                            tensor_set(kernel_gradient, k, l, d, kernel_value);
+    for (int i = 0; i < gradient->rows; i++) {
+        for (int j = 0; j < gradient->cols; j++) {
+            float grad_value = tensor_get(gradient, i, j, 0);
+            bias_gradient += grad_value;
+            for (int d = 0; d < kernel->tensor->depth; d++) {
+              for (int k = 0; k < kernel->tensor->rows; k++) {
+                for (int l = 0; l < kernel->tensor->cols; l++) {
+                    int ix = i * kernel->stride + k - kernel->padding;
+                    int iy = j * kernel->stride + l - kernel->padding;
+                    if (ix >= 0 && ix < input->rows && iy >= 0 && iy < input->cols) {
+                        float grad_value = tensor_get(gradient, i, j, 0);
+
+                        // 输入梯度：使用翻转的卷积核
+                        float input_value = tensor_get(input_gradient, ix, iy, d) + 
+                                      grad_value * tensor_get(kernel->tensor, 
+                                                                 kernel->tensor->rows-1-k, 
+                                                                 kernel->tensor->cols-1-l, d);
+                        tensor_set(input_gradient, ix, iy, d, input_value);
+
+                        // 卷积核梯度：保持不变
+                        float kernel_value = tensor_get(kernel->tensor, k, l, d) - 
+                                        kernel->learning_rate * grad_value * tensor_get(input, ix, iy, d);
+                        tensor_set(kernel->tensor, k, l, d, kernel_value);
                         }
                     }
                 }
@@ -89,10 +113,6 @@ Tensor *conv_kernel_backward(ConvKernel *kernel, Tensor *input, Tensor *gradient
         }
     }
 
-    // Update kernel weights and return input gradient
-    tensor_mul_value(kernel_gradient, kernel->learning_rate);
-    tensor_sub(kernel->tensor, kernel_gradient);
-    tensor_free(kernel_gradient);
 
     kernel->bias -= kernel->learning_rate * bias_gradient;
     return input_gradient;
