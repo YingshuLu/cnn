@@ -5,6 +5,7 @@
 Activation *sigmoid_instance = 0;
 Activation *relu_instance = 0;
 Activation *leaky_relu_instance = 0;
+Activation *equal_instance = 0;
 
 float sigmoid(float x) {
     return 1.0 / (1.0 + exp(-x));
@@ -29,6 +30,17 @@ float leaky_relu(float x) {
 float leaky_relu_derivative(float x) {
     return x > 0 ? 1.0f : 0.01f;
 }
+
+float equal(float x) {
+    return x;
+}
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+float equal_derivative(float x) {
+    return 1.0f;
+}
+#pragma GCC diagnostic pop
 
 Activation *activation_create() {
     return (Activation *)malloc(sizeof(Activation));
@@ -59,4 +71,13 @@ Activation *activation_leaky_relu() {
         leaky_relu_instance->derivate = leaky_relu_derivative;
     }
     return leaky_relu_instance;
+}
+
+Activation *activation_equal() {
+    if (!equal_instance) {
+        equal_instance = activation_create();
+        equal_instance->activate = equal;
+        equal_instance->derivate = equal_derivative;
+    }
+    return equal_instance;
 }

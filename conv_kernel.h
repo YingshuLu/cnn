@@ -2,11 +2,9 @@
 #define CONV_KERNEL_H
 
 #include "activation.h"
-#include "layer.h"
 #include "tensor.h"
 
 typedef struct ConvKernel {
-    Layer layer;
     Tensor *tensor;
     float bias;
     float learning_rate;

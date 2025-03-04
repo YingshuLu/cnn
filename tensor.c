@@ -202,3 +202,30 @@ Tensor *tensor_slice_refer(Tensor *tensor, int depth_start, int depth_end) {
     }
     return slice;
 }
+
+Vector *tensor_flatten(Tensor *tensor) {
+    Vector *vector = vector_create(tensor->rows * tensor->cols * tensor->depth);
+    int index = 0;
+    for (int d = 0; d < tensor->depth; d++) {
+        for (int i = 0; i < tensor->rows; i++) {
+            for (int j = 0; j < tensor->cols; j++) {
+                vector_set(vector, index++, tensor_get(tensor, i, j, d));
+            }
+        }
+    }
+    return vector;
+}
+
+Tensor *vector_to_tensor(Vector *vector, int rows, int cols, int depth) {
+    assert(vector->size == rows * cols * depth);
+    Tensor *tensor = tensor_create(vector->size, 1, 1);
+    int index = 0;
+    for (int d = 0; d < depth; d++) {
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                tensor_set(tensor, i, j, d, vector_get(vector, index++));
+            }
+        }
+    }
+    return tensor;
+}

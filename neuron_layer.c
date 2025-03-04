@@ -102,6 +102,8 @@ LayerNeuron *layer_neuron_create(int size, int input_size, Activation *activatio
     layer->neurons_size = size;
     layer->input_size = input_size;
     layer->learning_rate = learning_rate;
+    
+    activation = activation ? activation : activation_equal();
     for (int i = 0; i < size; i++) {
         layer->neurons[i] = neuron_create(input_size, activation);
     }
