@@ -70,7 +70,7 @@ int main() {
 
     Network *network = network_create();
 
-    LayerNeuron *layer0 = layer_neuron_create(6, input_size, activation_leaky_relu(), 0.001);
+    LayerNeuron *layer0 = layer_neuron_create(10, input_size, activation_leaky_relu(), 0.001);
     LayerNeuron *layer1 = layer_neuron_create(3, layer0->neurons_size, activation_sigmoid(), 0.001);
     
     network_add_layer(network, (Layer*)layer0);

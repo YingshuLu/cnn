@@ -30,7 +30,7 @@ Tensor *_tensor_conv2d(Tensor *input, Tensor *kernel, int stride, int padding, f
     return output;
 }
 
-ConvKernel *conv_kernel_create(Tensor *tensor, float bias, float learning_rate, int stride, int padding, Activation *activation) {
+ConvKernel *conv_kernel_create(Tensor *tensor, float bias, float learning_rate, int stride, int padding, Activator *activation) {
     ConvKernel *kernel = malloc(sizeof(ConvKernel));
     kernel->tensor = tensor;
     kernel->bias = bias;
@@ -44,6 +44,7 @@ ConvKernel *conv_kernel_create(Tensor *tensor, float bias, float learning_rate, 
 
 void conv_kernel_free(ConvKernel *kernel) {
     tensor_free(kernel->tensor);
+    tensor_unrefer(kernel->conv_output);
     free(kernel);
 }
 
@@ -60,13 +61,7 @@ Tensor *conv_kernel_forward(ConvKernel *kernel, Tensor *input) {
     return output;
 }
 
-Tensor *conv_kernel_backward(ConvKernel *kernel, Tensor *input, Tensor *gradient) {
-    // Initialize gradients for input and kernel
-    Tensor *input_gradient = tensor_create(input->rows, input->cols, input->depth);
-    Tensor *kernel_gradient = tensor_create(kernel->tensor->rows, kernel->tensor->cols, kernel->tensor->depth);
-    float bias_gradient = 0.0f;
-
-    /*
+/*
        [Example]
        Input: [M, N, 3]
        Kernel: [3, 3, 3]
@@ -81,20 +76,27 @@ Tensor *conv_kernel_backward(ConvKernel *kernel, Tensor *input, Tensor *gradient
        dF/Dw = [1 x MN] x [MN x 27] = [1 x 27]
        dF/Db = Sum([MN x 1]) = [1 x 1]
        dF/Dx = [MN x 1] x [1 x 27] = [MN x 27]
-    */
+*/
+Tensor *conv_kernel_backward(ConvKernel *kernel, Tensor *input, Tensor *gradient) {
+    assert(input->depth == kernel->tensor->depth &&
+           gradient->rows == kernel->conv_output->rows &&
+           gradient->cols == kernel->conv_output->cols);
+
+    Tensor *input_gradient = tensor_create(input->rows, input->cols, input->depth);
+    float bias_gradient = 0.0f;
 
     for (int i = 0; i < gradient->rows; i++) {
         for (int j = 0; j < gradient->cols; j++) {
-            float grad_value = tensor_get(gradient, i, j, 0);
+            float grad_value = tensor_get(gradient, i, j, 0) * 
+                        kernel->activation->derivate(tensor_get(kernel->conv_output, i, j, 0));
             bias_gradient += grad_value;
+
             for (int d = 0; d < kernel->tensor->depth; d++) {
               for (int k = 0; k < kernel->tensor->rows; k++) {
                 for (int l = 0; l < kernel->tensor->cols; l++) {
                     int ix = i * kernel->stride + k - kernel->padding;
                     int iy = j * kernel->stride + l - kernel->padding;
                     if (ix >= 0 && ix < input->rows && iy >= 0 && iy < input->cols) {
-                        float grad_value = tensor_get(gradient, i, j, 0);
-
                         // 输入梯度：使用翻转的卷积核
                         float input_value = tensor_get(input_gradient, ix, iy, d) + 
                                       grad_value * tensor_get(kernel->tensor, 
@@ -112,7 +114,6 @@ Tensor *conv_kernel_backward(ConvKernel *kernel, Tensor *input, Tensor *gradient
             }
         }
     }
-
 
     kernel->bias -= kernel->learning_rate * bias_gradient;
     return input_gradient;

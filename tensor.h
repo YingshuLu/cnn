@@ -40,5 +40,7 @@ void tensor_div(Tensor *tensor, Tensor *other);
 
 Tensor *tensor_slice_copy(Tensor *tensor, int depth_start, int depth_end);
 Tensor *tensor_slice_refer(Tensor *tensor, int depth_start, int depth_end);
+Vector *tensor_flatten(Tensor *tensor);
+Tensor *vector_to_tensor(Vector *vector, int rows, int cols, int depth);
 
 #endif

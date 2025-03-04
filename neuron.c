@@ -1,6 +1,6 @@
 #include "neuron.h"
 
-Neuron *neuron_create(int input_size, Activation *activation) {
+Neuron *neuron_create(int input_size, Activator *activation) {
     Neuron *neuron = (Neuron *)malloc(sizeof(Neuron));
     neuron->weights = vector_create(input_size);
     neuron->bias = 0;

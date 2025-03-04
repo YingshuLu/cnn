@@ -1,13 +1,14 @@
 #ifndef ACTIVATION_H
 #define ACTIVATION_H
 
-typedef struct Activation {
+typedef struct Activator {
     float (*activate)(float);
     float (*derivate)(float);
-} Activation;
+} Activator;
 
-Activation *activation_sigmoid();
-Activation *activation_relu();
-Activation *activation_leaky_relu();
+Activator *activation_sigmoid();
+Activator *activation_relu();
+Activator *activation_leaky_relu();
+Activator *activation_equal();
 
 #endif

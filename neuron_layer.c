@@ -96,12 +96,14 @@ Vector *layer_neuron_backward(void *layer_base, Vector *gradient) {
     return new_gradient;
 }
 
-LayerNeuron *layer_neuron_create(int size, int input_size, Activation *activation, float learning_rate) {
+LayerNeuron *layer_neuron_create(int size, int input_size, Activator *activation, float learning_rate) {
     LayerNeuron *layer = (LayerNeuron *)malloc(sizeof(LayerNeuron));
     layer->neurons = (Neuron **)malloc(size * sizeof(Neuron *));
     layer->neurons_size = size;
     layer->input_size = input_size;
     layer->learning_rate = learning_rate;
+    
+    activation = activation ? activation : activation_equal();
     for (int i = 0; i < size; i++) {
         layer->neurons[i] = neuron_create(input_size, activation);
     }
