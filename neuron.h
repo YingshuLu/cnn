@@ -7,11 +7,11 @@
 typedef struct Neuron {
     Vector *weights;
     float bias;
-    Activation *activation;
+    Activator *activation;
     float linear_output;
 } Neuron;
 
-Neuron *neuron_create(int input_size, Activation *activation);
+Neuron *neuron_create(int input_size, Activator *activation);
 void neuron_free(Neuron *neuron);
 float neuron_activate(Neuron *neuron, Vector *input);
 

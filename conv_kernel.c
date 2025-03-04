@@ -30,7 +30,7 @@ Tensor *_tensor_conv2d(Tensor *input, Tensor *kernel, int stride, int padding, f
     return output;
 }
 
-ConvKernel *conv_kernel_create(Tensor *tensor, float bias, float learning_rate, int stride, int padding, Activation *activation) {
+ConvKernel *conv_kernel_create(Tensor *tensor, float bias, float learning_rate, int stride, int padding, Activator *activation) {
     ConvKernel *kernel = malloc(sizeof(ConvKernel));
     kernel->tensor = tensor;
     kernel->bias = bias;

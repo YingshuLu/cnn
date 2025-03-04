@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include "activation.h"
 
-Activation *sigmoid_instance = 0;
-Activation *relu_instance = 0;
-Activation *leaky_relu_instance = 0;
-Activation *equal_instance = 0;
+Activator *sigmoid_instance = 0;
+Activator *relu_instance = 0;
+Activator *leaky_relu_instance = 0;
+Activator *equal_instance = 0;
 
 float sigmoid(float x) {
     return 1.0 / (1.0 + exp(-x));
@@ -42,11 +42,11 @@ float equal_derivative(float x) {
 }
 #pragma GCC diagnostic pop
 
-Activation *activation_create() {
-    return (Activation *)malloc(sizeof(Activation));
+Activator *activation_create() {
+    return (Activator *)malloc(sizeof(Activator));
 }
 
-Activation *activation_sigmoid() {
+Activator *activation_sigmoid() {
     if (!sigmoid_instance) {
         sigmoid_instance = activation_create();
         sigmoid_instance->activate = sigmoid;
@@ -55,7 +55,7 @@ Activation *activation_sigmoid() {
     return sigmoid_instance;
 }
 
-Activation *activation_relu() {
+Activator *activation_relu() {
     if (!relu_instance) {
         relu_instance = activation_create();
         relu_instance->activate = relu;
@@ -64,7 +64,7 @@ Activation *activation_relu() {
     return relu_instance;
 }
 
-Activation *activation_leaky_relu() {
+Activator *activation_leaky_relu() {
     if (!leaky_relu_instance) {
         leaky_relu_instance = activation_create();
         leaky_relu_instance->activate = leaky_relu;
@@ -73,7 +73,7 @@ Activation *activation_leaky_relu() {
     return leaky_relu_instance;
 }
 
-Activation *activation_equal() {
+Activator *activation_equal() {
     if (!equal_instance) {
         equal_instance = activation_create();
         equal_instance->activate = equal;
