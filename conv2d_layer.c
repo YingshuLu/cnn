@@ -13,14 +13,14 @@ void _conv2d_layer_free(void *layer) {
     conv2d_layer_free((Conv2DLayer *)layer);
 }
 
-Conv2DLayer *conv2d_layer_create(int in_channels, int out_channels, int kernel_size, int stride, int padding, Activator* activation) {
+Conv2DLayer *conv2d_layer_create(int in_channels, int out_channels, int kernel_size, int stride, int padding, Activator* activator) {
     Conv2DLayer *layer = malloc(sizeof(Conv2DLayer));
     layer->in_channels = in_channels;
     layer->out_channels = out_channels;
     layer->kernels = calloc(out_channels, sizeof(ConvKernel *));
     layer->kernel_size = kernel_size;
     for (int i = 0; i < out_channels; i++) {
-        layer->kernels[i] = conv_kernel_create(tensor_create(kernel_size, kernel_size, in_channels), 0.0f, 0.001f, stride, padding, activation);
+        layer->kernels[i] = conv_kernel_create(tensor_create(kernel_size, kernel_size, in_channels), 0.0f, 0.001f, stride, padding, activator);
     }
     layer->input = 0;
     layer->layer.forward = _conv2d_layer_forward;

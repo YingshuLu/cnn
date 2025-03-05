@@ -6,6 +6,7 @@
 typedef struct Layer {
     Vector *(*forward)(void *layer, Vector *input);
     Vector *(*backward)(void *layer, Vector *gradient);
+    void (*free)(void *layer);
 } Layer;
 
 #endif
