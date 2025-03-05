@@ -2,16 +2,16 @@
 #define NEURON_H
 
 #include "vector.h"
-#include "activation.h"
+#include "activator.h"
 
 typedef struct Neuron {
     Vector *weights;
     float bias;
-    Activator *activation;
+    Activator *activator;
     float linear_output;
 } Neuron;
 
-Neuron *neuron_create(int input_size, Activator *activation);
+Neuron *neuron_create(int input_size, Activator *activator);
 void neuron_free(Neuron *neuron);
 float neuron_activate(Neuron *neuron, Vector *input);
 

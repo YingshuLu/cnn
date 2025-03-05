@@ -30,20 +30,20 @@ so backward gradient:
         dY/dB1 = dY/dP * dP/dN * dN/dM * dM/dB1 = Sum(dSIGMOD(P)/dP * W2) * dLERU(M)/dM * 1
 */
 
-void layer_neuron_update_input(LayerNeuron *layer, Vector *input) {
+void _layer_neuron_update_input(LayerNeuron *layer, Vector *input) {
     vector_unrefer(layer->input);
     layer->input = vector_refer(input);
 }
 
-void layer_neuron_update_output(LayerNeuron *layer, Vector *output) {
+void _layer_neuron_update_output(LayerNeuron *layer, Vector *output) {
     vector_unrefer(layer->output);
     layer->output = vector_refer(output);
 }
 
-Vector *layer_neuron_forward(void *layer_base, Vector *input) {
+Vector *_layer_neuron_forward(void *layer_base, Vector *input) {
     LayerNeuron *layer = (LayerNeuron *)layer_base;
     assert(input->size == layer->input_size);
-    layer_neuron_update_input(layer, input);
+    _layer_neuron_update_input(layer, input);
     Vector* output = vector_create(layer->neurons_size);
 
     #pragma omp parallel for
@@ -51,11 +51,11 @@ Vector *layer_neuron_forward(void *layer_base, Vector *input) {
         output->data[i] = neuron_activate(layer->neurons[i], input);
     }
     
-    layer_neuron_update_output(layer, output);
+    _layer_neuron_update_output(layer, output);
     return output;
 }
 
-Vector *layer_neuron_backward(void *layer_base, Vector *gradient) {
+Vector *_layer_neuron_backward(void *layer_base, Vector *gradient) {
     LayerNeuron *layer = (LayerNeuron *)layer_base;
     assert(layer->neurons_size == gradient->size);
 
@@ -69,7 +69,7 @@ Vector *layer_neuron_backward(void *layer_base, Vector *gradient) {
     for (int i = 0; i < layer->neurons_size; i++) {
         Neuron *neuron = layer->neurons[i];
         float loss_value = gradient->data[i];
-        float error = neuron->activation->derivate(neuron->linear_output);
+        float error = neuron->activator->derivate(neuron->linear_output);
         float delta = error * loss_value;
         if (fabs(delta) > 1.0) {
             delta = delta > 0 ? 1.0 : -1.0;
@@ -96,20 +96,26 @@ Vector *layer_neuron_backward(void *layer_base, Vector *gradient) {
     return new_gradient;
 }
 
-LayerNeuron *layer_neuron_create(int size, int input_size, Activator *activation, float learning_rate) {
+void _layer_neuron_free(void *layer_base) {
+    LayerNeuron *layer = (LayerNeuron *)layer_base;
+    layer_neuron_free(layer);
+}
+
+LayerNeuron *layer_neuron_create(int size, int input_size, Activator *activator, float learning_rate) {
     LayerNeuron *layer = (LayerNeuron *)malloc(sizeof(LayerNeuron));
     layer->neurons = (Neuron **)malloc(size * sizeof(Neuron *));
     layer->neurons_size = size;
     layer->input_size = input_size;
     layer->learning_rate = learning_rate;
-    
-    activation = activation ? activation : activation_equal();
+
+    activator = activator ? activator : activator_equal();
     for (int i = 0; i < size; i++) {
-        layer->neurons[i] = neuron_create(input_size, activation);
+        layer->neurons[i] = neuron_create(input_size, activator);
     }
 
-    layer->layer.forward = layer_neuron_forward;
-    layer->layer.backward = layer_neuron_backward;
+    layer->layer.forward = _layer_neuron_forward;
+    layer->layer.backward = _layer_neuron_backward;
+    layer->layer.free = _layer_neuron_free;
     layer->input = 0;
     layer->output = 0;
     return layer;

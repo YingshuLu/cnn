@@ -14,7 +14,7 @@ typedef struct Conv2DLayer {
     Tensor *input;
 } Conv2DLayer;
 
-Conv2DLayer *conv2d_layer_create(int in_channels, int out_channels, int kernel_size, int stride, int padding, Activator* activation);
+Conv2DLayer *conv2d_layer_create(int in_channels, int out_channels, int kernel_size, int stride, int padding, Activator* activator);
 void conv2d_layer_init_bias(Conv2DLayer *layer, Vector *bias);
 void conv2d_layer_free(Conv2DLayer *layer);
 Tensor *conv2d_layer_forward(Conv2DLayer *layer, Tensor *input);

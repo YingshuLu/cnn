@@ -30,14 +30,14 @@ Tensor *_tensor_conv2d(Tensor *input, Tensor *kernel, int stride, int padding, f
     return output;
 }
 
-ConvKernel *conv_kernel_create(Tensor *tensor, float bias, float learning_rate, int stride, int padding, Activator *activation) {
+ConvKernel *conv_kernel_create(Tensor *tensor, float bias, float learning_rate, int stride, int padding, Activator *activator) {
     ConvKernel *kernel = malloc(sizeof(ConvKernel));
     kernel->tensor = tensor;
     kernel->bias = bias;
     kernel->learning_rate = learning_rate;
     kernel->stride = stride;
     kernel->padding = padding;
-    kernel->activation = activation;
+    kernel->activator = activator;
     kernel->conv_output = 0;
     return kernel;
 }
@@ -54,9 +54,9 @@ Tensor *conv_kernel_forward(ConvKernel *kernel, Tensor *input) {
     kernel->conv_output = tensor_refer(conv_output);
 
     Tensor *output = conv_output;
-    if (kernel->activation) {
+    if (kernel->activator) {
         Tensor *output = tensor_copy(conv_output);
-        tensor_apply(output, kernel->activation->activate);
+        tensor_apply(output, kernel->activator->activate);
     }
     return output;
 }
@@ -88,7 +88,7 @@ Tensor *conv_kernel_backward(ConvKernel *kernel, Tensor *input, Tensor *gradient
     for (int i = 0; i < gradient->rows; i++) {
         for (int j = 0; j < gradient->cols; j++) {
             float grad_value = tensor_get(gradient, i, j, 0) * 
-                        kernel->activation->derivate(tensor_get(kernel->conv_output, i, j, 0));
+                        kernel->activator->derivate(tensor_get(kernel->conv_output, i, j, 0));
             bias_gradient += grad_value;
 
             for (int d = 0; d < kernel->tensor->depth; d++) {

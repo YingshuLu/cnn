@@ -13,7 +13,7 @@ typedef struct LayerNeuron {
     Vector* output;
 } LayerNeuron;
 
-LayerNeuron *layer_neuron_create(int size, int input_size, Activator *activation, float learning_rate);
+LayerNeuron *layer_neuron_create(int size, int input_size, Activator *activator, float learning_rate);
 void layer_neuron_free(LayerNeuron *layer);
 
 #endif

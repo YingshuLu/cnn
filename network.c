@@ -5,6 +5,7 @@
 #include <string.h>
 #include "network.h"
 #include "neuron_layer.h"
+#include "loss.h"
 
 float binary_cross_entropy(Vector *predicted, Vector *target) {
     float loss = 0.0f;
@@ -67,7 +68,7 @@ void network_train(Network *network, Vector **samples, int samples_count, Vector
     for (int epoch = 0; epoch < epochs; epoch++) {
         float epoch_loss = 0.0;
         for (int i = 0; i < samples_count; i++) {
-            predicted = network_predict(network, samples[i]);
+            predicted = network_forward(network, samples[i]);
             
             /*
             //print predicted and label
@@ -82,18 +83,15 @@ void network_train(Network *network, Vector **samples, int samples_count, Vector
 
             gradient = predicted;
             */
-
-           // 计算交叉熵损失
-            float loss = binary_cross_entropy(predicted, labels[i]);
+            LossFunction *loss_function = loss_binary_cross_entropy();
+            float loss = loss_function->loss(predicted, labels[i]);
             epoch_loss += loss;
-            
-            // 计算交叉熵梯度
-            gradient = binary_cross_entropy_gradient(predicted, labels[i]);
-            
-            for (int j = network->count - 1; j >= 0; j--) {
-                gradient = network->layers[j]->backward(network->layers[j], gradient);
-            }
+
+            gradient = loss_function->gradient(predicted, labels[i]);
+            gradient = network_backward(network, gradient);
+
             vector_free(predicted);
+            vector_free(gradient);
         }
 
         epoch_loss /= samples_count;
@@ -104,9 +102,36 @@ void network_train(Network *network, Vector **samples, int samples_count, Vector
     }
 }
 
-void network_free(Network *network) {
+Vector *network_forward(Network *network, Vector *input) {
+    if (network->count == 0) {
+        return input;
+    }
+
+    Vector *vector = vector_refer(input);
+    Layer *layer;
     for (int i = 0; i < network->count; i++) {
-        free(network->layers[i]);
+        layer = network->layers[i];
+        vector = layer->forward(layer, input);
+        vector_unrefer(input);
+        input = vector;
+    }
+    return vector;
+}
+
+Vector *network_backward(Network *network, Vector *gradient) {
+    Layer *layer;
+    for (int i = network->count - 1; i >= 0; i--) {
+        layer = network->layers[i];
+        gradient = layer->backward(layer, gradient);
+    }
+    return gradient;
+}
+
+void network_free(Network *network) {
+    Layer *layer;
+    for (int i = 0; i < network->count; i++) {
+        layer = network->layers[i];
+        layer->free(layer);
     }
     free(network->layers);
     free(network);

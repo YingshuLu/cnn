@@ -5,7 +5,7 @@ A c implement of Convolutional Neural Network
 - [x] Convolutional Layer
 - [x] Pooling Layer
 - [x] Fully Connected Layer
-- [x] Activation Function
+- [x] activator Function
 - [x] Loss Function
 - [x] Backpropagation
 - [x] Training

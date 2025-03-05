@@ -17,19 +17,28 @@ void tensor_network_add_layer(TensorNetwork *network, TensorLayer *layer) {
 }
 
 Tensor *tensor_network_forward(TensorNetwork *network, Tensor *input) { 
-    Tensor *tensor = input;
+    if (network->count == 0) {
+        return input;
+    }
+
+    Tensor *tensor = tensor_refer(input);
+    TensorLayer *layer;
     for (int i = 0; i < network->count; i++) {
-        tensor = network->layers[i]->forward(network->layers[i], tensor);
+        layer = network->layers[i];
+        tensor = layer->forward(layer, input);
+        tensor_unrefer(input);
+        input = tensor;
     }
     return tensor;
 }
 
 Tensor *tensor_network_backward(TensorNetwork *network, Tensor *gradient) {
-    Tensor *tensor = gradient;
+    TensorLayer *layer;
     for (int i = network->count - 1; i >= 0; i--) {
-        tensor = network->layers[i]->backward(network->layers[i], tensor);
+        layer = network->layers[i];
+        gradient = layer->backward(layer, gradient);
     }
-    return tensor;
+    return gradient;
 }
 
 void tensor_network_free(TensorNetwork *network) {
