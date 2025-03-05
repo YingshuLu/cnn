@@ -42,6 +42,14 @@ void _layer_neuron_update_output(LayerNeuron *layer, Vector *output) {
 
 Vector *_layer_neuron_forward(void *layer_base, Vector *input) {
     LayerNeuron *layer = (LayerNeuron *)layer_base;
+    if (layer->layze) {
+        layer->input_size = input->size;
+        for (int i = 0; i < layer->neurons_size; i++) {
+            layer->neurons[i] = neuron_create(layer->input_size, layer->activator);
+        }
+        layer->layze = 0;
+    }
+
     assert(input->size == layer->input_size);
     _layer_neuron_update_input(layer, input);
     Vector* output = vector_create(layer->neurons_size);
@@ -109,6 +117,7 @@ LayerNeuron *layer_neuron_create(int size, int input_size, Activator *activator,
     layer->learning_rate = learning_rate;
 
     activator = activator ? activator : activator_equal();
+    layer->activator = activator ? activator : activator_equal();
     for (int i = 0; i < size; i++) {
         layer->neurons[i] = neuron_create(input_size, activator);
     }
@@ -118,6 +127,27 @@ LayerNeuron *layer_neuron_create(int size, int input_size, Activator *activator,
     layer->layer.free = _layer_neuron_free;
     layer->input = 0;
     layer->output = 0;
+    return layer;
+}
+
+LayerNeuron *layer_neuron_create_layze(int size, Activator *activator, float learning_rate) {
+    LayerNeuron *layer = (LayerNeuron *)malloc(sizeof(LayerNeuron));
+    layer->neurons = (Neuron **)malloc(size * sizeof(Neuron *));
+    layer->neurons_size = size;
+    layer->input_size = 0;
+    layer->learning_rate = learning_rate;
+    layer->activator = activator ? activator : activator_equal();
+
+    for (int i = 0; i < size; i++) {
+        layer->neurons[i] = 0;
+    }
+
+    layer->layer.forward = _layer_neuron_forward;
+    layer->layer.backward = _layer_neuron_backward;
+    layer->layer.free = _layer_neuron_free;
+    layer->input = 0;
+    layer->output = 0;
+    layer->layze = 1;
     return layer;
 }
 

@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <math.h>
 #include "loss.h"
 
@@ -5,6 +6,7 @@ LossFunction* _binary_cross_entropy_loss_instance = NULL;
 LossFunction* _mean_squared_error_loss_instance = NULL;
 
 float _binary_cross_entropy(Vector *predicted, Vector *target) {
+    assert(predicted->size == target->size);
     float loss = 0.0f;
     float epsilon = 1e-15; // 防止log(0)
     
@@ -20,6 +22,7 @@ float _binary_cross_entropy(Vector *predicted, Vector *target) {
 
 // 交叉熵的梯度计算
 Vector* _binary_cross_entropy_gradient(Vector *predicted, Vector *target) {
+    assert(predicted->size == target->size);
     float epsilon = 1e-15;
     Vector *gradient = vector_create(predicted->size);
     
@@ -33,6 +36,7 @@ Vector* _binary_cross_entropy_gradient(Vector *predicted, Vector *target) {
 }
 
 float _mean_squared_error(Vector *predicted, Vector *target) {
+    assert(predicted->size == target->size);
     float loss = 0.0f;
     for (int i = 0; i < predicted->size; i++) {
         loss += pow(predicted->data[i] - target->data[i], 2);
@@ -41,6 +45,7 @@ float _mean_squared_error(Vector *predicted, Vector *target) {
 }
 
 Vector* _mean_squared_error_gradient(Vector *predicted, Vector *target) {
+    assert(predicted->size == target->size);
     Vector *gradient = vector_create(predicted->size);
     for (int i = 0; i < predicted->size; i++) {
         gradient->data[i] = predicted->data[i] - target->data[i];
