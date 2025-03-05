@@ -3,6 +3,7 @@
         "math.h": "c",
         "iosfwd": "cpp",
         "conv_kernel.h": "c",
-        "operator.h": "c"
+        "operator.h": "c",
+        "loss.h": "c"
     }
 }
