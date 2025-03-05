@@ -1,6 +1,9 @@
 # cnn
 A c implement of Convolutional Neural Network
 
+# how to build
+```make```
+
 ## Features
 - [x] Convolutional Layer
 - [x] Pooling Layer
