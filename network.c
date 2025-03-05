@@ -6,6 +6,7 @@
 #include "network.h"
 #include "neuron_layer.h"
 #include "loss.h"
+#include "shuffle.h"
 
 float binary_cross_entropy(Vector *predicted, Vector *target) {
     float loss = 0.0f;
@@ -65,29 +66,19 @@ Vector *network_predict(Network *network, Vector *input) {
 
 void network_train(Network *network, Vector **samples, int samples_count, Vector **labels, int epochs) {
     Vector *predicted, *gradient;
+    LossFunction *loss_function = loss_binary_cross_entropy();
+    Shuffle *shuffle = shuffle_create(samples_count);
+    int index = 0;
     for (int epoch = 0; epoch < epochs; epoch++) {
         float epoch_loss = 0.0;
-        for (int i = 0; i < samples_count; i++) {
-            predicted = network_forward(network, samples[i]);
-            
-            /*
-            //print predicted and label
-            //printf("--------------------------------\n");
-            //printf("Predicted: [%f, %f, %f]\n", predicted->data[0], predicted->data[1], predicted->data[2]);
-            //printf("Label: [%f, %f, %f]\n", label->data[0], label->data[1], label->data[2]);
-            vector_sub(predicted, labels[i]);
-            float loss_pow = vector_dot(predicted, predicted);
-            epoch_loss += sqrt(loss_pow);
-            printf("- Epoch %d sample_loss: %f\n", epoch, sqrt(loss_pow));
-            //printf("--------------------------------\n");
+        shuffle_shuffle(shuffle);
 
-            gradient = predicted;
-            */
-            LossFunction *loss_function = loss_binary_cross_entropy();
-            float loss = loss_function->loss(predicted, labels[i]);
-            epoch_loss += loss;
+        while (!shuffle_end(shuffle)) {
+            index = shuffle_next(shuffle);
+            predicted = network_forward(network, samples[index]);
+            epoch_loss += loss_function->loss(predicted, labels[index]);
 
-            gradient = loss_function->gradient(predicted, labels[i]);
+            gradient = loss_function->gradient(predicted, labels[index]);
             gradient = network_backward(network, gradient);
 
             vector_free(predicted);
@@ -100,6 +91,7 @@ void network_train(Network *network, Vector **samples, int samples_count, Vector
             break;
         }
     }
+    shuffle_free(shuffle);
 }
 
 Vector *network_forward(Network *network, Vector *input) {

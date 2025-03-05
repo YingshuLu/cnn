@@ -5,6 +5,7 @@
 #include "vector.h"
 #include "network.h"
 #include "tensor_network.h"
+
 typedef struct CNN {
     TensorNetwork *tensor_network;
     Network *network;

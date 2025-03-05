@@ -4,6 +4,7 @@
         "iosfwd": "cpp",
         "conv_kernel.h": "c",
         "operator.h": "c",
-        "loss.h": "c"
+        "loss.h": "c",
+        "stdlib.h": "c"
     }
 }
