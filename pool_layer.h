@@ -9,5 +9,4 @@ typedef struct PoolLayer {
     int padding;
 } PoolLayer;
 
-
 #endif
