@@ -55,7 +55,7 @@ Tensor *conv_kernel_forward(ConvKernel *kernel, Tensor *input) {
 
     Tensor *output = conv_output;
     if (kernel->activator) {
-        Tensor *output = tensor_copy(conv_output);
+        output = tensor_copy(conv_output);
         tensor_apply(output, kernel->activator->activate);
     }
     return output;
