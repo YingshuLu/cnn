@@ -19,8 +19,8 @@ void shuffle_free(Shuffle *shuffle) {
 }
 
 void shuffle_shuffle(Shuffle *shuffle) {
-    for (int i = 0; i < shuffle->count; i++) {
-        int j = rand() % shuffle->count;
+    for (int i = shuffle->count - 1; i > 0; i--) {
+        int j = rand() % i;
         if (i == j) {
             continue;
         }

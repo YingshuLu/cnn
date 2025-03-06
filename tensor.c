@@ -218,7 +218,7 @@ Vector *tensor_flatten(Tensor *tensor) {
 
 Tensor *vector_to_tensor(Vector *vector, int rows, int cols, int depth) {
     assert(vector->size == rows * cols * depth);
-    Tensor *tensor = tensor_create(vector->size, 1, 1);
+    Tensor *tensor = tensor_create(rows, cols, depth);
     int index = 0;
     for (int d = 0; d < depth; d++) {
         for (int i = 0; i < rows; i++) {

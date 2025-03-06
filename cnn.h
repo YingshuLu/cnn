@@ -13,7 +13,7 @@ typedef struct CNN {
 
 CNN *cnn_create(TensorNetwork *tensor_network, Network *network);
 void cnn_free(CNN *cnn);
-Vector *cnn_train(CNN *cnn, Tensor **samples, int samples_count, Vector **lables, int epochs);
+Vector *cnn_train(CNN *cnn, Tensor **samples, int samples_count, Vector **lables, int batch_size, int epochs);
 Vector *cnn_predict(CNN *cnn, Tensor *input);
 
 #endif
