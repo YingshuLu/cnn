@@ -5,6 +5,7 @@
         "conv_kernel.h": "c",
         "operator.h": "c",
         "loss.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "tensor_network.h": "c"
     }
 }

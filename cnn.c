@@ -22,7 +22,6 @@ Vector *cnn_train(CNN *cnn, Tensor **samples, int samples_count, Vector **lables
     LossFunction *loss_function = loss_binary_cross_entropy();
     Shuffle *shuffle = shuffle_create(samples_count);
     int index = 0;
-
     int batch_count = samples_count / batch_size;
 
     for (int epoch = 0; epoch < epochs; epoch++) {

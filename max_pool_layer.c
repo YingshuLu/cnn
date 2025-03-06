@@ -31,7 +31,11 @@ void max_pool_layer_free(MaxPoolLayer *layer) {
 }
 
 Tensor *max_pool_layer_forward(MaxPoolLayer *layer, Tensor *input) {
-    layer->input_mask = tensor_create(input->rows, input->cols, input->depth);
+    if (!layer->input_mask) {
+        layer->input_mask = tensor_create(input->rows, input->cols, input->depth);
+    } else {
+        tensor_fill_value(layer->input_mask, 0.0f);
+    }
 
     int output_rows = (input->rows - layer->pool_size) / layer->stride + 1;
     int output_cols = (input->cols - layer->pool_size) / layer->stride + 1;
@@ -83,7 +87,6 @@ Tensor *max_pool_layer_backward(MaxPoolLayer *layer, Tensor *gradient) {
             }
         }
     }
-    tensor_free(layer->input_mask);
     return input_gradient;
 }
 
