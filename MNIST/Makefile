@@ -13,6 +13,7 @@ TARGET = mnist_test
 
 $(TARGET): $(OBJS)
 	$(CC) $(OBJS) -o $(TARGET) $(LDFLAGS)
+	rm -f ${OBJS}
 
 %.o: %.c $(HDRS)
 	$(CC) $(CFLAGS) -c $< -o $@

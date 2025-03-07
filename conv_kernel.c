@@ -18,9 +18,13 @@ Tensor *_tensor_conv2d(Tensor *input, Tensor *kernel, int stride, int padding, f
                     for (int l = 0; l < kernel->cols; l++) {
                         int ix = i * stride + k - padding;
                         int iy = j * stride + l - padding;
+                        
+                        float input_val = 0.0f;
                         if (ix >= 0 && ix < input->rows && iy >= 0 && iy < input->cols) {
-                            sum += tensor_get(input, ix, iy, d) * tensor_get(kernel, k, l, d);
+                            input_val = tensor_get(input, ix, iy, d);
                         }
+                        
+                        sum += input_val * tensor_get(kernel, k, l, d);
                     }
                 }
             }
@@ -55,7 +59,7 @@ Tensor *conv_kernel_forward(ConvKernel *kernel, Tensor *input) {
 
     Tensor *output = conv_output;
     if (kernel->activator) {
-        Tensor *output = tensor_copy(conv_output);
+        output = tensor_copy(conv_output);
         tensor_apply(output, kernel->activator->activate);
     }
     return output;

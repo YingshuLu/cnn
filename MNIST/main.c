@@ -9,9 +9,10 @@
 #include "max_pool_layer.h"
 #include "tensor_network.h"
 #include "neuron_layer.h"
+#include "dropout_layer.h"
 #include "cnn.h"
 
-float LEARNING_RATE = 0.0001;
+float LEARNING_RATE = 0.001;
 
 int max_index(Vector *vector) {
     float max = vector->data[0];
@@ -31,25 +32,28 @@ int main(int argc, char **argv) {
 
     int label_size = train_data->labels[0]->size;
 
-    Conv2DLayer *conv2_layer = conv2d_layer_create(1, 32, 3, 1, 0, LEARNING_RATE, activator_leaky_relu());
-    MaxPoolLayer *max_pool_layer = max_pool_layer_create(2, 2);
+    Conv2DLayer *conv2_layer = conv2d_layer_create(1, 16, 3, 1, 1, LEARNING_RATE, activator_leaky_relu());
+    //MaxPoolLayer *max_pool_layer = max_pool_layer_create(2, 2);
 
-    Conv2DLayer *conv2_layer2 = conv2d_layer_create(32, 64, 3, 1, 0, LEARNING_RATE, activator_leaky_relu());
+    Conv2DLayer *conv2_layer2 = conv2d_layer_create(16, 32, 3, 1, 0, LEARNING_RATE, activator_leaky_relu());
     MaxPoolLayer *max_pool_layer2 = max_pool_layer_create(2, 2);
     
     TensorNetwork *tensor_network = tensor_network_create();
     tensor_network_add_layer(tensor_network, (TensorLayer*)conv2_layer);
-    tensor_network_add_layer(tensor_network, (TensorLayer*)max_pool_layer);
+    //tensor_network_add_layer(tensor_network, (TensorLayer*)max_pool_layer);
     tensor_network_add_layer(tensor_network, (TensorLayer*)conv2_layer2);
     tensor_network_add_layer(tensor_network, (TensorLayer*)max_pool_layer2);
 
-    LayerNeuron *layer0 = layer_neuron_create_layze(128, activator_leaky_relu(), LEARNING_RATE);
-    LayerNeuron *layer1 = layer_neuron_create(label_size, layer0->neurons_size, activator_sigmoid(), LEARNING_RATE);
-    //SoftmaxLayer *layer2 = softmax_layer_create();
+    LayerNeuron *layer0 = layer_neuron_create_layze(32, activator_leaky_relu(), LEARNING_RATE);
+    LayerNeuron *layer1 = layer_neuron_create(label_size, layer0->neurons_size, activator_equal(), LEARNING_RATE);
+    DropoutLayer *layer2 = dropout_layer_create(0.5);
+    SoftmaxLayer *layer3 = softmax_layer_create();
+
     Network *network = network_create();
     network_add_layer(network, (Layer*)layer0);
     network_add_layer(network, (Layer*)layer1);
-    //network_add_layer(network, (Layer*)layer2);
+    network_add_layer(network, (Layer*)layer2);
+    network_add_layer(network, (Layer*)layer3);
 
     CNN *cnn = cnn_create(tensor_network, network);
     cnn_train(cnn, train_data->images, train_data->count, train_data->labels, 128, 10);
