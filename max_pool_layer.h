@@ -8,7 +8,7 @@ typedef struct MaxPoolLayer {
     TensorLayer layer;
     int pool_size;
     int stride;
-    Tensor *input_mask;
+    Tensor *output_mask;
 } MaxPoolLayer;
 
 MaxPoolLayer *max_pool_layer_create(int pool_size, int stride);
